@@ -1,0 +1,42 @@
+{
+"mapper":{
+  "projectLocation":"/Users/yanzhanghai/Documents/dev/mitu.workspace/genSourcePlus/",
+  "package":"com.mitu.dao.ext",
+  "name":"TravelPlanExtMapper",
+  "methods":[{
+      "name":"queryTravelPlan",
+      "returnEntity":{
+        "package":"com.mitu.entity",
+        "className":"TravelPlanEntity",
+        "tables":[
+          {
+            "name":"flight",
+            "modelPackage":"com.mitu.model",
+            "modelClass":"Flight",
+            "modelMap":"com.mitu.dao.FlightMapper.BaseResultMap"
+          },
+          {
+            "name":"travel_plan",
+            "modelPackage":"com.mitu.model",
+            "modelClass":"TravelPlan",
+            "modelMap":"com.mitu.dao.TravelPlanMapper.BaseResultMap"
+          },
+          {
+            "name":"hotel",
+            "modelPackage":"com.mitu.model",
+            "modelClass":"Hotel",
+            "modelMap":"com.mitu.dao.HotelMapper.BaseResultMap"
+          },
+          {
+            "name":"viewspot",
+            "modelPackage":"com.mitu.model",
+            "modelClass":"Viewspot",
+            "modelMap":"com.mitu.dao.ViewspotMapper.BaseResultMap"
+          }
+        ],
+        "join":"travel_plan.id=b.id",
+      },
+    }
+  ]
+}
+}
