@@ -2,9 +2,9 @@ package ${package};
 
 import org.apache.ibatis.jdbc.SQL;
 
-public class ${name}SqlBuilder {
+public class ${name}SqlProvider {
 	<#list methods as method>
-	public String ${method.name}(Condition condition){
+	public String ${method.name}(${name}Condition condition){
 		return new SQL(){{
 			<#assign entity=method.returnEntity>
   			<#assign tables=entity.tables>

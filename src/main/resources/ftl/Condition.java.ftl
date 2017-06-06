@@ -6,11 +6,11 @@ import java.util.regex.Pattern;
 
 import org.apache.ibatis.jdbc.SQL;
 
-public class Condition extends HashMap<String, Object>{
+public class ${name}Condition extends HashMap<String, Object>{
 
 	private static final long serialVersionUID = 1L;
 	private SQL sql;
-	public Condition() {
+	public ${name}Condition() {
 		this.sql=new SQL();
 	}
 	public SQL where(String condition){

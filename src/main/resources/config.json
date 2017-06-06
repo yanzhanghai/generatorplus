@@ -1,40 +1,28 @@
 {
 "mapper":{
-  "projectLocation":"/Users/yanzhanghai/Documents/dev/mitu.workspace/genSourcePlus/",
+  "projectLocation":"/Users/yanzhanghai/Documents/dev/mitu.workspace/mitu/service",
   "package":"com.mitu.dao.ext",
-  "name":"TravelPlanExtMapper",
+  "name":"TravellerExtMapper",
   "methods":[{
-      "name":"queryTravelPlan",
+      "name":"queryTraveller",
       "returnEntity":{
         "package":"com.mitu.entity",
-        "className":"TravelPlanEntity",
+        "className":"CustomerEntity",
         "tables":[
           {
-            "name":"flight",
+            "name":"traveller",
             "modelPackage":"com.mitu.model",
-            "modelClass":"Flight",
-            "modelMap":"com.mitu.dao.FlightMapper.BaseResultMap"
+            "modelClass":"Traveller",
+            "modelMap":"com.mitu.dao.TravellerMapper.BaseResultMap"
           },
           {
-            "name":"travel_plan",
+            "name":"customer",
             "modelPackage":"com.mitu.model",
-            "modelClass":"TravelPlan",
-            "modelMap":"com.mitu.dao.TravelPlanMapper.BaseResultMap"
-          },
-          {
-            "name":"hotel",
-            "modelPackage":"com.mitu.model",
-            "modelClass":"Hotel",
-            "modelMap":"com.mitu.dao.HotelMapper.BaseResultMap"
-          },
-          {
-            "name":"viewspot",
-            "modelPackage":"com.mitu.model",
-            "modelClass":"Viewspot",
-            "modelMap":"com.mitu.dao.ViewspotMapper.BaseResultMap"
+            "modelClass":"Customer",
+            "modelMap":"com.mitu.dao.CustomerMapper.BaseResultMap"
           }
         ],
-        "join":"travel_plan.id=b.id",
+        "join":"customer.id=traveller.customer_id",
       },
     }
   ]

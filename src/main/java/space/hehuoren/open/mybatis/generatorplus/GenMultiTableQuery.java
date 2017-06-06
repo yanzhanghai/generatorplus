@@ -37,7 +37,7 @@ public class GenMultiTableQuery {
 					genMapper();
 					genEntity();
 					genMapperXml();
-					genSqlBuider();
+					genSqlProvider();
 				}
 			};
 		} catch (IOException | TemplateException | SQLException e) {
@@ -112,12 +112,12 @@ public class GenMultiTableQuery {
 
 		}
 		StringBuffer outFile = new StringBuffer("src/main/resources/mybatis/")
-				.append(config.getString("name")).append("Mapper.xml");
+				.append(config.getString("name")).append(".xml");
 		genFile(config, "mapper.xml.ftl", outFile.toString());
 
 	}
 
-	public void genSqlBuider() throws IOException, TemplateException,
+	public void genSqlProvider() throws IOException, TemplateException,
 			SQLException {
 		JSONArray methods = config.getJSONArray("methods");
 		for (Object object : methods) {
@@ -133,10 +133,10 @@ public class GenMultiTableQuery {
 		StringBuffer outFile = new StringBuffer("src/main/java/")
 				.append(StringUtils.replace(config.getString("package"), ".",
 						"/")).append("/").append(config.getString("name"))
-				.append("SqlBuilder").append(".java");
-		genFile(config, "SqlBuilder.java.ftl", outFile.toString());
+				.append("SqlProvider").append(".java");
+		genFile(config, "SqlProvider.java.ftl", outFile.toString());
 		genFile(config, "Condition.java.ftl",
-				outFile.toString().replace("SqlBuilder", "Condition"));
+				outFile.toString().replace("SqlProvider", "Condition"));
 
 	}
 
@@ -175,7 +175,7 @@ public class GenMultiTableQuery {
 		JSONObject json = JSON
 				.parseObject(FileUtils
 						.readFileToString(new File(
-								"/Users/yanzhanghai/Documents/dev/mitu.workspace/genSourcePlus/src/main/resources/config.json")));
+								"/Users/yanzhanghai/Documents/dev/mitu.workspace/generatorplus/src/main/resources/config.json")));
 		this.config = json.getJSONObject("mapper");
 
 	}

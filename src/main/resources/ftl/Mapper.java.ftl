@@ -11,7 +11,7 @@ import ${method.returnEntity.package}.${method.returnEntity.className};
 public interface ${name} {
 	<#list methods as method>
 	@ResultMap("${package}.${method.returnEntity.className}")
-	@SelectProvider(type = ${package}.${name}SQLProvider.class, method = "${method.name}")
-	List<${method.returnEntity.className}> ${method.name}(Condition condition);
+	@SelectProvider(type = ${package}.${name}SqlProvider.class, method = "${method.name}")
+	List<${method.returnEntity.className}> ${method.name}(${name}Condition condition);
 	</#list>
 }
