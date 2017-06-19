@@ -1,7 +1,7 @@
 {
-"mapper":{
   "projectLocation":"/Users/yanzhanghai/Documents/dev/mitu.workspace/mitu/service",
   "package":"com.mitu.dao.ext",
+  mappers:[{
   "name":"TravellerExtMapper",
   "methods":[{
       "name":"queryTraveller",
@@ -22,9 +22,69 @@
             "modelMap":"com.mitu.dao.CustomerMapper.BaseResultMap"
           }
         ],
-        "join":"customer.id=traveller.customer_id",
+        "joins":[{
+          condition:"customer on customer.id=traveller.customer_id",
+          type:"join"
+        }
+        ],
       },
-    }
+      }]
+    },
+    {
+    "name":"ChannelPriceExtMapper",
+    "methods":[{
+        "name":"queryChannelPrice",
+        "returnEntity":{
+          "package":"com.mitu.entity",
+          "className":"ChannelPriceEntity",
+          "tables":[
+            {
+              "name":"customer_channel",
+              "modelPackage":"com.mitu.model",
+              "modelClass":"CustomerChannel",
+              "modelMap":"com.mitu.dao.CustomerChannelMapper.BaseResultMap"
+            },
+            {
+              "name":"channel_price",
+              "modelPackage":"com.mitu.model",
+              "modelClass":"ChannelPrice",
+              "modelMap":"com.mitu.dao.ChannelPriceMapper.BaseResultMap"
+            }
+          ],
+          "joins":[{
+              condition:"channel_price on customer_channel.id=channel_price.channel_id and channel_price.visa_id=#{visa_id}",
+              type:"left"
+            }
+          ],
+        },
+      },
+      {
+          "name":"queryVisaCategoryPrice",
+          "returnEntity":{
+            "package":"com.mitu.entity",
+            "className":"VisaCategoryPriceEntity",
+            "tables":[
+              {
+                "name":"visa_category",
+                "modelPackage":"com.mitu.model",
+                "modelClass":"VisaCategory",
+                "modelMap":"com.mitu.dao.VisaCategoryMapper.BaseResultMap"
+              },
+              {
+                "name":"channel_price",
+                "modelPackage":"com.mitu.model",
+                "modelClass":"ChannelPrice",
+                "modelMap":"com.mitu.dao.ChannelPriceMapper.BaseResultMap"
+              }
+            ],
+            "joins":[{
+                condition:"channel_price on visa_category.id=channel_price.visa_id and channel_price.channel_id=#{channel_id}",
+                type:"left"
+              }
+            ],
+          },
+        },
+    ]
+  }
   ]
-}
 }

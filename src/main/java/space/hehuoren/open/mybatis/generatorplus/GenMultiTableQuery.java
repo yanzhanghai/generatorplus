@@ -64,80 +64,122 @@ public class GenMultiTableQuery {
 		cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
 		cfg.setLogTemplateExceptions(false);
 		Template temp = cfg.getTemplate(template);
-		Writer out = new OutputStreamWriter(FileUtils.openOutputStream(
-				new File(config.getString("projectLocation"), outFile)));
+		Writer out = new OutputStreamWriter(
+				FileUtils.openOutputStream(new File(config
+						.getString("projectLocation"), outFile)));
 		temp.process(ftlModel, out);
 	}
 
 	public void genEntity() throws IOException, TemplateException {
-		JSONArray methods = config.getJSONArray("methods");
-		for (Object object : methods) {
-			JSONObject json = (JSONObject) object;
-			JSONObject entity = json.getJSONObject("returnEntity");
-			JSONArray tables = entity.getJSONArray("tables");
-			for (Object table : tables) {
-				JSONObject t = (JSONObject) table;
-				t.put("propertyName",
-						tableNameToPropertyName(t.getString("name")));
+		JSONArray mappers = config.getJSONArray("mappers");
+		for (Object mapper : mappers) {
+			JSONObject m = (JSONObject) mapper;
+			JSONArray methods = m.getJSONArray("methods");
+			for (Object object : methods) {
+				JSONObject json = (JSONObject) object;
+				JSONObject entity = json.getJSONObject("returnEntity");
+				JSONArray tables = entity.getJSONArray("tables");
+				for (Object table : tables) {
+					JSONObject t = (JSONObject) table;
+					t.put("propertyName",
+							tableNameToPropertyName(t.getString("name")));
+				}
+				StringBuffer outFile = new StringBuffer("src/main/java/")
+						.append(StringUtils.replace(
+								entity.getString("package"), ".", "/"))
+						.append("/").append(entity.getString("className"))
+						.append(".java");
+				genFile(entity, "Entity.ftl", outFile.toString());
 			}
-			StringBuffer outFile = new StringBuffer("src/main/java/")
-					.append(StringUtils.replace(entity.getString("package"),
-							".", "/")).append("/")
-					.append(entity.getString("className")).append(".java");
-			genFile(entity, "Entity.ftl", outFile.toString());
 		}
 
 	}
 
 	public void genMapper() throws IOException, TemplateException {
-		StringBuffer outFile = new StringBuffer("src/main/java/")
-				.append(StringUtils.replace(config.getString("package"), ".",
-						"/")).append("/").append(config.getString("name"))
-				.append(".java");
-		genFile(config, "Mapper.java.ftl", outFile.toString());
+		JSONArray mappers = config.getJSONArray("mappers");
+		for (Object mapper : mappers) {
+			JSONObject m = (JSONObject) mapper;
+
+			StringBuffer outFile = new StringBuffer("src/main/java/")
+					.append(StringUtils.replace(config.getString("package"),
+							".", "/")).append("/").append(m.getString("name"))
+					.append(".java");
+			m.put("package", config.getString("package"));
+			genFile(m, "Mapper.java.ftl", outFile.toString());
+		}
 
 	}
 
 	public void genMapperXml() throws IOException, TemplateException {
-		JSONArray methods = config.getJSONArray("methods");
-		for (Object object : methods) {
-			JSONObject json = (JSONObject) object;
-			JSONObject entity = json.getJSONObject("returnEntity");
-			JSONArray tables = entity.getJSONArray("tables");
-			for (Object table : tables) {
-				JSONObject t = (JSONObject) table;
-				t.put("propertyName",
-						tableNameToPropertyName(t.getString("name")));
-			}
+		JSONArray mappers = config.getJSONArray("mappers");
+		for (Object mapper : mappers) {
+			JSONObject m = (JSONObject) mapper;
+			JSONArray methods = m.getJSONArray("methods");
+			for (Object object : methods) {
+				JSONObject json = (JSONObject) object;
+				JSONObject entity = json.getJSONObject("returnEntity");
+				JSONArray tables = entity.getJSONArray("tables");
+				for (Object table : tables) {
+					JSONObject t = (JSONObject) table;
+					t.put("propertyName",
+							tableNameToPropertyName(t.getString("name")));
+				}
 
+			}
+			StringBuffer outFile = new StringBuffer(
+					"src/main/resources/mybatis/").append(m.getString("name"))
+					.append(".xml");
+			m.put("package", config.getString("package"));
+			genFile(m, "mapper.xml.ftl", outFile.toString());
 		}
-		StringBuffer outFile = new StringBuffer("src/main/resources/mybatis/")
-				.append(config.getString("name")).append(".xml");
-		genFile(config, "mapper.xml.ftl", outFile.toString());
 
 	}
 
 	public void genSqlProvider() throws IOException, TemplateException,
 			SQLException {
-		JSONArray methods = config.getJSONArray("methods");
-		for (Object object : methods) {
-			JSONObject json = (JSONObject) object;
-			JSONObject entity = json.getJSONObject("returnEntity");
-			JSONArray tables = entity.getJSONArray("tables");
-			for (Object table : tables) {
-				JSONObject t = (JSONObject) table;
-				t.put("cols", getColumns(t.getString("name")));
+		JSONArray mappers = config.getJSONArray("mappers");
+		for (Object mapper : mappers) {
+			JSONObject m = (JSONObject) mapper;
+			JSONArray methods = m.getJSONArray("methods");
+			for (Object object : methods) {
+				JSONObject method = (JSONObject) object;
+				JSONObject entity = method.getJSONObject("returnEntity");
+				JSONArray tables = entity.getJSONArray("tables");
+				for (Object table : tables) {
+					JSONObject t = (JSONObject) table;
+					t.put("cols", getColumns(t.getString("name")));
+				}
+				method.put("primaryKey", primaryKeyColum(tables));
+
 			}
-
+			StringBuffer outFile = new StringBuffer("src/main/java/")
+					.append(StringUtils.replace(config.getString("package"),
+							".", "/")).append("/").append(m.getString("name"))
+					.append("SqlProvider").append(".java");
+			m.put("package", config.getString("package"));
+			genFile(m, "SqlProvider.java.ftl", outFile.toString());
+			genFile(m, "Condition.java.ftl",
+					outFile.toString().replace("SqlProvider", "Condition"));
 		}
-		StringBuffer outFile = new StringBuffer("src/main/java/")
-				.append(StringUtils.replace(config.getString("package"), ".",
-						"/")).append("/").append(config.getString("name"))
-				.append("SqlProvider").append(".java");
-		genFile(config, "SqlProvider.java.ftl", outFile.toString());
-		genFile(config, "Condition.java.ftl",
-				outFile.toString().replace("SqlProvider", "Condition"));
 
+	}
+
+	private String primaryKeyColum(JSONArray tables) throws SQLException {
+		Connection conn = connect();
+		StringBuffer sb = new StringBuffer();
+		for (Object table : tables) {
+			JSONObject t = (JSONObject) table;
+			ResultSet rs = conn.getMetaData().getPrimaryKeys(null, null,
+					t.getString("name"));
+			while (rs.next()) {
+				sb.append(",").append("ifnull(").append(t.getString("name")).append(".")
+						.append(rs.getString("COLUMN_NAME")).append(",0)");
+			}
+		}
+		sb.deleteCharAt(0);
+		sb.append(") as id");
+		sb.insert(0, "concat (");
+		return sb.toString();
 	}
 
 	private static String tableNameToPropertyName(String table) {
@@ -163,8 +205,9 @@ public class GenMultiTableQuery {
 		ResultSetMetaData meta = rs.getMetaData();
 		int n = meta.getColumnCount();
 		for (int i = 1; i <= n; i++) {
-			sb.append(",").append(meta.getColumnName(i)).append(" as ")
-					.append(table).append("_").append(meta.getColumnName(i));
+			sb.append(",").append(table).append(".")
+					.append(meta.getColumnName(i)).append(" as ").append(table)
+					.append("_").append(meta.getColumnName(i));
 		}
 		sb.deleteCharAt(0);
 		return sb.toString();
@@ -176,7 +219,7 @@ public class GenMultiTableQuery {
 				.parseObject(FileUtils
 						.readFileToString(new File(
 								"/Users/yanzhanghai/Documents/dev/mitu.workspace/generatorplus/src/main/resources/config.json")));
-		this.config = json.getJSONObject("mapper");
+		this.config = json;
 
 	}
 }

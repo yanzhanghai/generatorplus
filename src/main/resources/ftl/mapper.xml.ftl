@@ -6,8 +6,9 @@
   <#assign entity=method.returnEntity>
   <#assign tables=entity.tables>
   <resultMap id="${entity.className}" type="${entity.package}.${entity.className}">
+  	<id column="ID" jdbcType="VARCHAR" property="id" />
   	<#list tables as table>
-    <association property="${table.propertyName}" javaType="${table.modelPackage}.${table.modelClass}" resultMap="${table.modelMap}" columnPrefix="${table.propertyName}_"/>
+    <association property="${table.propertyName}" javaType="${table.modelPackage}.${table.modelClass}" resultMap="${table.modelMap}" columnPrefix="${table.name}_"/>
     </#list>
   </resultMap>
   </#list>

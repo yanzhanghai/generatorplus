@@ -20,8 +20,7 @@ public class ${name}Condition extends HashMap<String, Object>{
 		Pattern pattern = Pattern.compile("(?<=\\{)[\\S\\s]*(?=\\})");
 		Matcher matcher = pattern.matcher(condition);
 		if(matcher.find()){
-			String[] s=matcher.group().split(",");
-			put(s[0],o);
+			put(matcher.group(),o);
 		}
 		return sql.WHERE(condition);
 	}
@@ -34,8 +33,11 @@ public class ${name}Condition extends HashMap<String, Object>{
 	public SQL orderBy(String columns){
 		return sql.ORDER_BY(columns);
 	}
-	
+
 	public SQL getSql(){
 		return sql;
+	}
+	public void setParameter(String name,Object value){
+		this.put(name,value);
 	}
 }
